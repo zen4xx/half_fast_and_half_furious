@@ -74,13 +74,14 @@ int main()
     glm::vec3 car_tail_pos = glm::vec3(0);
 
     while (engine.isWindowOpen()){
-
-        if (engine.isKeyPressed(GLFW_KEY_W)) camera.Pos.z -= 0.001;
-        if (engine.isKeyPressed(GLFW_KEY_S)) camera.Pos.z += 0.001;
-        if (engine.isKeyPressed(GLFW_KEY_A)) camera.Pos.x -= 0.001;
-        if (engine.isKeyPressed(GLFW_KEY_D)) camera.Pos.x += 0.001;
-        if (engine.isKeyPressed(GLFW_KEY_Z)) camera.Pos.y += 0.001;
-        if (engine.isKeyPressed(GLFW_KEY_X)) camera.Pos.y -= 0.001;
+        if (engine.isKeyPressed(GLFW_KEY_W))
+            camera.ProcessKeyboard(GLFW_KEY_W, engine.getDeltaTime());
+        if (engine.isKeyPressed(GLFW_KEY_S))
+            camera.ProcessKeyboard(GLFW_KEY_S, engine.getDeltaTime());
+        if (engine.isKeyPressed(GLFW_KEY_D))
+            camera.ProcessKeyboard(GLFW_KEY_D, engine.getDeltaTime());
+        if (engine.isKeyPressed(GLFW_KEY_A))
+            camera.ProcessKeyboard(GLFW_KEY_A, engine.getDeltaTime());
 
         if (engine.isKeyPressed(GLFW_KEY_F)) std::cout << engine.getFPSCount() << std::endl;
 

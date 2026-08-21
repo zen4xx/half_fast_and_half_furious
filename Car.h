@@ -69,7 +69,7 @@ public:
     
     int gear = 2; // 1 is N (cause 0 is R)
 
-    float turn_angle = 50;
+    float turn_angle = 70;
     
 public:
     Tiny_engine *m_engine = nullptr;

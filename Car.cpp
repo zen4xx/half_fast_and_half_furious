@@ -190,11 +190,15 @@ void Car::turn(dir d, double dt)
     {
         if (d == right)
         {
-            this->m_yaw += this->turn_angle * dt;
+            if (abs(this->speed * 10) < turn_angle)
+                this->m_yaw += dt * this->speed * 10;  
+            else this->m_yaw += turn_angle * dt;
         }
         else if (d == left)
         {
-            this->m_yaw -= this->turn_angle * dt;
+            if (abs(this->speed * 10) < turn_angle)
+                this->m_yaw -= dt * this->speed * 10;
+            else this->m_yaw -= turn_angle * dt;
         }
     }
 }
