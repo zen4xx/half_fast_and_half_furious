@@ -101,9 +101,9 @@ int main()
         std::cout << "gear: " << car.gear - 1 << std::endl;
         
         car.update(engine.getDeltaTime());
-        // car_tail_pos = -car.m_pos - (car.m_front * -3.f);
-        // engine.setView("main", glm::lookAt(glm::vec3(car_tail_pos.x, car_tail_pos.y - 1, car_tail_pos.z), -car.m_pos, camera.WorldUp));
-        engine.setView("main", camera.GetViewMatrix());
+        car_tail_pos = car.m_pos - (car.m_front * 3.f * ((car.speed/50)+1.f));
+        engine.setView("main", glm::lookAt(glm::vec3(car_tail_pos.x, car_tail_pos.y - 1.5f, -car_tail_pos.z), glm::vec3(car.m_pos.x, car.m_pos.y - 1.f, -car.m_pos.z), camera.WorldUp));
+        // engine.setView("main", camera.GetViewMatrix());
         engine.update();
         engine.drawScene("main");
     }

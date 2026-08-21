@@ -95,6 +95,11 @@ void Car::accelerate(double dt)
     float wheelForce =
         std::min(tractionForce, gripForce);
 
+    float totalForce =
+        wheelForce
+        + this->air_resistance * this->speed * this->speed
+        + this->rolling_resistance;
+
     float acceleration =
         wheelForce / this->weight;
 
