@@ -1,0 +1,11 @@
+half_fast_and_half_furious
+*.cmake
+CMakeCache.txt
+Makefile
+/CMakeFiles
+/.vscode
+/build
+/_deps
+/.cache
+log
+compile_commands.json
