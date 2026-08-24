@@ -70,7 +70,7 @@ public:
         updateCameraVectors();
     }
 
-private:
+public:
     void updateCameraVectors() {
         glm::vec3 front;
         front.x = cos(glm::radians(Yaw)) * cos(glm::radians(Pitch));

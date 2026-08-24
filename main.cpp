@@ -6,6 +6,7 @@
 #include <GLFW/glfw3.h>
 #include <glm/ext/matrix_transform.hpp>
 #include <glm/trigonometric.hpp>
+#include <string>
 #include <thread>
 #include <iostream>
 
@@ -69,7 +70,9 @@ int main()
 
     car.set("main", "mustang", &engine, glm::vec3(0.0f, 1.0f, 0.0f), glm::rotate(glm::mat4(1.f), glm::radians(180.f), glm::vec3(1.0f, 0.0f, 0.0f)));
     
-    bool key_1 = 0, key_2 = 0; // toggles
+    bool key_1 = 0, key_2 = 0, free_cam = 0, third_person_cam = 0; // toggles
+
+    bool is_free_cam;
 
     glm::vec3 car_tail_pos = glm::vec3(0);
 
@@ -94,6 +97,10 @@ int main()
         else if (!engine.isKeyPressed(GLFW_KEY_1) && key_1 == 1) {key_1 = 0; car.gear--; }
         if (engine.isKeyPressed(GLFW_KEY_2)) key_2 = 1;
         else if (!engine.isKeyPressed(GLFW_KEY_2) && key_2 == 1) {key_2 = 0; car.gear++; }
+        if (engine.isKeyPressed(GLFW_KEY_C)) free_cam = 1;
+        else if (!engine.isKeyPressed(GLFW_KEY_C) && free_cam == 1) {free_cam = 0; is_free_cam = 1; camera.Position = glm::vec3(car_tail_pos.x, car_tail_pos.y - 1.5f, -car_tail_pos.z); camera.Yaw = car.m_yaw - 90.f; camera.updateCameraVectors(); }
+        if (engine.isKeyPressed(GLFW_KEY_X)) third_person_cam = 1;
+        else if (!engine.isKeyPressed(GLFW_KEY_X) && third_person_cam == 1) {third_person_cam = 0; is_free_cam = 0; }
         
         
         std::cout << "RPM: " << car.RPM << std::endl;
@@ -101,9 +108,16 @@ int main()
         std::cout << "gear: " << car.gear - 1 << std::endl;
         
         car.update(engine.getDeltaTime());
-        car_tail_pos = car.m_pos - (car.m_front * 3.f * ((car.speed/50)+1.f));
-        engine.setView("main", glm::lookAt(glm::vec3(car_tail_pos.x, car_tail_pos.y - 1.5f, -car_tail_pos.z), glm::vec3(car.m_pos.x, car.m_pos.y - 1.f, -car.m_pos.z), camera.WorldUp));
-        // engine.setView("main", camera.GetViewMatrix());
+
+        if (is_free_cam)
+            engine.setView("main", camera.GetViewMatrix());
+
+        else 
+        {
+            car_tail_pos = car.m_pos - (car.m_front * 3.f * ((car.speed/50)+1.f));
+            engine.setView("main", glm::lookAt(glm::vec3(car_tail_pos.x, car_tail_pos.y - 1.5f, -car_tail_pos.z), glm::vec3(car.m_pos.x, car.m_pos.y - 1.f, -car.m_pos.z), camera.WorldUp));
+        }
+
         engine.update();
         engine.drawScene("main");
     }
