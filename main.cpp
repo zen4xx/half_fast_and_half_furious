@@ -115,7 +115,11 @@ int main()
 
         else 
         {
-            car_tail_pos = car.m_pos - (car.m_front * 3.f * ((car.speed/50)+1.f));
+            if (car.gear != 0)
+                car_tail_pos = car.m_pos - (car.m_front * 3.f * ((car.speed/50)+1.f));
+            else 
+                car_tail_pos = car.m_pos - (car.m_front * -5.f * ((-car.speed/50)+1.f)); // reverse
+
             engine.setView("main", glm::lookAt(glm::vec3(car_tail_pos.x, car_tail_pos.y - 1.5f, -car_tail_pos.z), glm::vec3(car.m_pos.x, car.m_pos.y - 1.f, -car.m_pos.z), camera.WorldUp));
         }
 

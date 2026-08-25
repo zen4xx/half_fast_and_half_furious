@@ -57,13 +57,11 @@ float getEngineRPM(
     float gearRatio,
     float finalDrive
 ) {
-    if (speed <= 0.0)
-        return 1000.0; 
 
     float wheelRPM =
         speed / (2.0 * PI * wheelRadius) * 60.0;
 
-    return wheelRPM * gearRatio * finalDrive;
+    return abs(wheelRPM * gearRatio * finalDrive);
 }
 
 void Car::accelerate(double dt)
@@ -95,7 +93,10 @@ void Car::accelerate(double dt)
     float wheelForce =
         std::min(tractionForce, gripForce);
 
-    float totalForce = wheelForce - this->rolling_resistance;
+    float totalForce;
+
+    if (gear > 1) totalForce = wheelForce - this->rolling_resistance;
+    else totalForce = wheelForce + this->rolling_resistance;
 
     float acceleration =
         wheelForce / this->weight;
@@ -169,7 +170,9 @@ void Car::update(double dt)
 
     if (this->speed != 0)
     {
-        this->speed -= (this->air_resistance * speed * speed) / this->weight * dt;
+        if (gear > 1) this->speed -= (this->air_resistance * speed * speed) / this->weight * dt;
+        else this->speed += (this->air_resistance * speed * speed) / this->weight * dt;
+
 
         m_front.x = sin(glm::radians(m_yaw));
         m_front.y = 0;
