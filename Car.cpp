@@ -95,10 +95,7 @@ void Car::accelerate(double dt)
     float wheelForce =
         std::min(tractionForce, gripForce);
 
-    float totalForce =
-        wheelForce
-        + this->air_resistance * this->speed * this->speed
-        + this->rolling_resistance;
+    float totalForce = wheelForce - this->rolling_resistance;
 
     float acceleration =
         wheelForce / this->weight;
@@ -153,7 +150,7 @@ void Car::brake(double dt)
         float totalForce =
             brakeForce
             + this->air_resistance * this->speed * this->speed
-            + this->rolling_resistance;
+            - this->rolling_resistance;
 
         float deceleration =
             totalForce / this->weight;
@@ -172,7 +169,7 @@ void Car::update(double dt)
 
     if (this->speed != 0)
     {
-        this->speed -= (this->rolling_resistance + this->air_resistance * speed * speed) / this->weight * dt;
+        this->speed -= (this->air_resistance * speed * speed) / this->weight * dt;
 
         m_front.x = sin(glm::radians(m_yaw));
         m_front.y = 0;
@@ -206,4 +203,17 @@ void Car::turn(dir d, double dt)
             else this->m_yaw -= turn_angle * dt;
         }
     }
+}
+
+void Car::engine_brake(double dt)
+{
+    if (this->speed <= 0 || this->gear == 1) return;
+
+    float deceleration =
+        getEngineTorque(RPM, torque_multiplyer) 
+        * gears[gear]
+        * efficiency 
+        / (weight * wheel_radius);
+        
+    speed -= deceleration * dt;
 }

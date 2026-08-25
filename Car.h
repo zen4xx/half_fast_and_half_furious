@@ -26,6 +26,7 @@ public:
 
     void accelerate(double dt);
     void brake(double dt);
+    void engine_brake(double dt);
     void turn(dir d, double dt);
 
     void update(double dt);

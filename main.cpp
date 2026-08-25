@@ -89,6 +89,7 @@ int main()
         if (engine.isKeyPressed(GLFW_KEY_F)) std::cout << engine.getFPSCount() << std::endl;
 
         if (engine.isKeyPressed(GLFW_KEY_UP)) car.accelerate(engine.getDeltaTime());
+        else car.engine_brake(engine.getDeltaTime());
         if (engine.isKeyPressed(GLFW_KEY_DOWN)) car.brake(engine.getDeltaTime());
         if (engine.isKeyPressed(GLFW_KEY_RIGHT)) car.turn(right, engine.getDeltaTime());
         if (engine.isKeyPressed(GLFW_KEY_LEFT)) car.turn(left, engine.getDeltaTime());
