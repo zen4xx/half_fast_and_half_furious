@@ -3,12 +3,11 @@
 #include "tiny_engine.h"
 #include "camera.h"
 #include "Car.h"
-#include <GLFW/glfw3.h>
-#include <glm/ext/matrix_transform.hpp>
-#include <glm/trigonometric.hpp>
 #include <string>
 #include <thread>
 #include <iostream>
+
+#include "sound.h"
 
 #define GAME_NAME "half fast & half furious"
 
@@ -70,11 +69,17 @@ int main()
 
     car.set("main", "mustang", &engine, glm::vec3(0.0f, 1.0f, 0.0f), glm::rotate(glm::mat4(1.f), glm::radians(180.f), glm::vec3(1.0f, 0.0f, 0.0f)));
     
+    car.torque_multiplyer = 2.64f;
+    car.weight = 1900.f;
+
     bool key_1 = 0, key_2 = 0, free_cam = 0, third_person_cam = 0; // toggles
 
     bool is_free_cam;
 
     glm::vec3 car_tail_pos = glm::vec3(0);
+
+    Sound_engine sound_engine;
+    sound_engine.start();
 
     while (engine.isWindowOpen()){
         if (engine.isKeyPressed(GLFW_KEY_W))
@@ -88,8 +93,8 @@ int main()
 
         if (engine.isKeyPressed(GLFW_KEY_F)) std::cout << engine.getFPSCount() << std::endl;
 
-        if (engine.isKeyPressed(GLFW_KEY_UP)) car.accelerate(engine.getDeltaTime());
-        else car.engine_brake(engine.getDeltaTime());
+        if (engine.isKeyPressed(GLFW_KEY_UP)) { car.accelerate(engine.getDeltaTime()); sound_engine.setThrottle(1.f); }
+        else { car.engine_brake(engine.getDeltaTime()); sound_engine.setThrottle(0.f); }
         if (engine.isKeyPressed(GLFW_KEY_DOWN)) car.brake(engine.getDeltaTime());
         if (engine.isKeyPressed(GLFW_KEY_RIGHT)) car.turn(right, engine.getDeltaTime());
         if (engine.isKeyPressed(GLFW_KEY_LEFT)) car.turn(left, engine.getDeltaTime());
@@ -122,7 +127,8 @@ int main()
 
             engine.setView("main", glm::lookAt(glm::vec3(car_tail_pos.x, car_tail_pos.y - 1.5f, -car_tail_pos.z), glm::vec3(car.m_pos.x, car.m_pos.y - 1.f, -car.m_pos.z), camera.WorldUp));
         }
-
+        
+        sound_engine.setRPM(car.RPM);
         engine.update();
         engine.drawScene("main");
     }

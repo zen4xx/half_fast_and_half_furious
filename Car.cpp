@@ -1,7 +1,4 @@
 #include "Car.h"
-#include <glm/ext/matrix_transform.hpp>
-#include <glm/geometric.hpp>
-#include <glm/trigonometric.hpp>
 
 #define PI 3.1415
 

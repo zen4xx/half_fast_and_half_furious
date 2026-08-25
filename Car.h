@@ -1,8 +1,6 @@
 #pragma once
 
 #include "tiny_engine.h"
-#include <glm/ext/matrix_transform.hpp>
-#include <glm/ext/vector_float3.hpp>
 #include <vector>
 #include <string>
 
