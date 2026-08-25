@@ -47,7 +47,7 @@ public:
 
     float final_drive = 4.1;
 
-    float max_brake_force = 10000.f; // N
+    float max_brake_force = 15000.f; // N
 
     float air_resistance = frontal_area * 1.225 * 0.5 * 0.3;
     float rolling_resistance = 0.015 * weight * g;

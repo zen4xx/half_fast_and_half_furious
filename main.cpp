@@ -74,7 +74,7 @@ int main()
 
     bool key_1 = 0, key_2 = 0, free_cam = 0, third_person_cam = 0; // toggles
 
-    bool is_free_cam;
+    bool is_free_cam = 0;
 
     glm::vec3 car_tail_pos = glm::vec3(0);
 
