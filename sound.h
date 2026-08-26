@@ -58,18 +58,16 @@ private:
     std::atomic<float> rpm{600.0f};
     std::atomic<float> throttle{0.0f};
 
-    // Фазы
     float phase = 0.0f;         
     float subPhase = 0.0f;      
     float subSubPhase = 0.0f;   
     float rumblePhase = 0.0f;   
 
-    // Для микро-флуктуаций (джиттера)
     float lpState1 = 0.0f, lpState2 = 0.0f;
     float noiseLP1 = 0.0f, noiseLP2 = 0.0f;
     float jitterTarget = 1.0f;
     float jitterCurrent = 1.0f;
-    float v8WobblePhase = 0.0f; // Новая переменная для пульсации V8
+    float v8WobblePhase = 0.0f; 
 
     std::mt19937 rng{std::random_device{}()};
     std::uniform_real_distribution<float> noiseDist{-1.0f, 1.0f};
@@ -110,7 +108,7 @@ private:
             ALint state;
             alGetSourcei(source, AL_SOURCE_STATE, &state);
             if (state != AL_PLAYING) alSourcePlay(source);
-            std::this_thread::sleep_for(std::chrono::milliseconds(5)); // Чуть меньше задержка для плавности
+            std::this_thread::sleep_for(std::chrono::milliseconds(5)); 
         }
     }
 
@@ -124,19 +122,15 @@ private:
         float phaseInc = baseFreq / SAMPLE_RATE;
         float subPhaseInc = (baseFreq * 0.5f) / SAMPLE_RATE;
         
-        // ИЗМЕНЕНИЕ 1: Сдвигаем суб-суб бас с 0.25x на 0.75x. 
-        // Вместо неслышимых 10 Гц мы получаем мощные 30-40 Гц на холостых ("удар в грудь").
         float subSubPhaseInc = (baseFreq * 0.75f) / SAMPLE_RATE; 
         float rumblePhaseInc = (baseFreq * 2.0f) / SAMPLE_RATE;
-        float wobblePhaseInc = (baseFreq * 0.5f) / SAMPLE_RATE; // Для пульсации V8
+        float wobblePhaseInc = (baseFreq * 0.5f) / SAMPLE_RATE; 
 
-        // Фильтр: чуть ниже срез, но выше резонанс для эффекта "резонанса камеры выхлопа"
         float filterQ = 0.75f + (currentThrottle * 0.4f); 
         float cutoff = 0.04f + (currentThrottle * 0.08f) + (rpmNorm * 0.06f); 
         cutoff = std::clamp(cutoff, 0.03f, 0.35f);
 
         for (int i = 0; i < numSamples; ++i) {
-            // Микро-джиттер (неравномерность вращения)
             if (i % 128 == 0) {
                 jitterTarget = 1.0f + (noiseDist(rng) - 0.5f) * 0.02f; 
             }
@@ -146,24 +140,19 @@ private:
             float phasePos = phase; // 0.0 to 1.0
             float wave = 0.0f;
 
-            // 1. ФУНДАМЕНТАЛЬНЫЙ РЫК (богатый тембр)
             wave += std::sin(TWO_PI * phase) * 1.0f;
             wave += std::sin(TWO_PI * phase * 2.0f) * 0.6f;
             wave += std::sin(TWO_PI * phase * 3.0f) * 0.25f;
 
-            // 2. ТЯЖЕЛЫЙ ТРАНЗИЕНТ СГОРАНИЯ ("Тхум")
-            // Делаем его более низким и коротким
             float combustionSpike = std::max(0.0f, 1.0f - (phasePos * 5.0f));
-            combustionSpike = combustionSpike * combustionSpike * combustionSpike; // Очень резкий спад
+            combustionSpike = combustionSpike * combustionSpike * combustionSpike; 
             
-            // Добавляем низкочастотный "удар" в момент вспышки
             float thud = std::sin(TWO_PI * phase * 1.5f) * combustionSpike * 0.9f * (0.6f + currentThrottle);
             float spikeNoise = noiseDist(rng) * combustionSpike * 0.25f * (0.5f + currentThrottle);
             wave += thud + spikeNoise;
 
-            // 3. МОЩНЫЙ СУБ-БАС И "МЕГА-БАС"
             float bassBoost = 1.2f + (currentThrottle * 0.5f);
-            if (rpmNorm < 0.5f) bassBoost *= 1.6f; // Агрессивный буст на низких оборотах
+            if (rpmNorm < 0.5f) bassBoost *= 1.6f; 
 
             float subSubAmp = 0.6f * bassBoost;
             float subAmp = 0.7f * bassBoost;
@@ -171,31 +160,24 @@ private:
             float lowEnd = (std::sin(TWO_PI * subPhase) * subAmp) + 
                            (std::sin(TWO_PI * subSubPhase) * subSubAmp);
 
-            // ИЗМЕНЕНИЕ 2: Психоакустическая сатурация низких частот
-            // Легкий перегруз баса создает гармоники, делая его "слышимым" и плотным даже на слабых динамиках
             lowEnd = std::tanh(lowEnd * 3.5f) * 0.75f; 
             wave += lowEnd;
 
-            // 4. ЭФФЕКТ "V8 POTATO-POTATO" (Неравномерность зажигания)
-            // Модулируем общую громкость баса с частотой половины оборота
             v8WobblePhase += wobblePhaseInc;
             if (v8WobblePhase >= 1.0f) v8WobblePhase -= 1.0f;
             
             float v8Wobble = 1.0f;
             if (rpmNorm < 0.45f) {
-                // На холостых и низких оборотах добавляем характерную "качель" громкости
                 v8Wobble = 0.85f + 0.15f * std::sin(TWO_PI * v8WobblePhase);
             }
             wave *= v8Wobble;
 
-            // 5. ШУМ ВЫХЛОПА (Привязан к фазе выпуска)
             float exhaustNoiseEnv = std::max(0.0f, (phasePos - 0.2f) * 1.25f);
             float rawNoise = noiseDist(rng);
             noiseLP1 = noiseLP1 + 0.08f * (rawNoise - noiseLP1);
             noiseLP2 = noiseLP2 + 0.04f * (noiseLP1 - noiseLP2);
             wave += noiseLP2 * exhaustNoiseEnv * 0.2f * currentThrottle;
 
-            // 6. РЕЗОНАНСНЫЙ ФИЛЬТР (Эмуляция объема выхлопной системы)
             for (int stage = 0; stage < 2; ++stage) {
                 float feedback = filterQ * (1.0f - cutoff);
                 wave = wave + feedback * lpState1;
@@ -205,19 +187,15 @@ private:
                 wave = wave * cutoff + lpState1 * (1.0f - cutoff);
             }
             
-            // Компенсация громкости после фильтра (бас теряет энергию при сглаживании)
             wave *= 1.6f; 
 
-            // 7. ФИНАЛЬНАЯ ДИНАМИКА И АНАЛОГОВЫЙ КЛИППИНГ
             float volume = 0.45f + 0.55f * currentThrottle;
             wave *= volume;
 
-            // Финальный "теплый" клиппер, который скругляет пики, добавляя жирности
             wave = std::tanh(wave * 2.0f);
 
             buffer[i] = static_cast<short>(std::clamp(wave * 32000.0f, -32768.0f, 32767.0f));
 
-            // Инкремент фаз
             phase += currentPhaseInc; if (phase >= 1.0f) phase -= 1.0f;
             subPhase += subPhaseInc; if (subPhase >= 1.0f) subPhase -= 1.0f;
             subSubPhase += subSubPhaseInc; if (subSubPhase >= 1.0f) subSubPhase -= 1.0f;

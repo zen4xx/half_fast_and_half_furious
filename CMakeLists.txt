@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.14)
 project(half_fast_and_half_furious)
 
+add_compile_options(-Wall -O2)
+
 include(FetchContent)
 
 set(TINY_ENGINE_NO_EXAMPLES ON CACHE BOOL "")
