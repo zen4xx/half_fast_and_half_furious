@@ -3,11 +3,13 @@
 #include "tiny_engine.h"
 #include "camera.h"
 #include "Car.h"
+#include <glm/ext/matrix_transform.hpp>
 #include <string>
 #include <thread>
 #include <iostream>
 
 #include "sound.h"
+#include "mp.h"
 
 #define GAME_NAME "half fast & half furious"
 
@@ -63,7 +65,27 @@ int main()
     mustang.pos = glm::translate(glm::mat4(1), glm::vec3(0.f));
 
     engine.addObject(plane);
-    engine.addObject(mustang);
+
+    Mp mp;
+    bool is_mp;
+    std::cout << "is mp: ";
+    std::cin >> is_mp;
+
+    if (is_mp == 0)
+        engine.addObject(mustang);
+
+    else 
+    {
+        std::string ip;
+        std::cout << "enter server ip: ";
+        std::cin >> ip;
+        mp.set_player("mustang", "cars/mustang/mustang.gltf", ip, &engine, "main");
+
+        std::cout << "write something to start\n";
+        std::cin >> ip;
+        mp.start();
+        
+    }
 
     Car car;
 
@@ -128,6 +150,8 @@ int main()
             engine.setView("main", glm::lookAt(glm::vec3(car_tail_pos.x, car_tail_pos.y - 1.5f, -car_tail_pos.z), glm::vec3(car.m_pos.x, car.m_pos.y - 1.f, -car.m_pos.z), camera.WorldUp));
         }
         
+        if (is_mp)
+            mp.update(glm::rotate(glm::translate(glm::rotate(glm::mat4(1.f), glm::radians(180.f), glm::vec3(1.0f, 0.0f, 0.0f)), car.m_pos), glm::radians(car.m_yaw), glm::vec3(0.f, 1.f, 0.f)));
         sound_engine.setRPM(car.RPM);
         engine.update();
         engine.drawScene("main");
