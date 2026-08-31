@@ -86,7 +86,6 @@ int main()
         mp.start();
         
     }
-
     Car car;
 
     car.set("main", "mustang", &engine, glm::vec3(0.0f, 1.0f, 0.0f), glm::rotate(glm::mat4(1.f), glm::radians(180.f), glm::vec3(1.0f, 0.0f, 0.0f)));
