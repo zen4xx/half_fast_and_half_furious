@@ -8,7 +8,6 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <netinet/in.h>
-#include <iostream>
 
 #define PORT         8080 
 #define MAX_LINE     1024 
@@ -120,6 +119,7 @@ public:
         int n = recvfrom(sockfd, buffer, MAX_LINE, MSG_WAITALL,
             (struct sockaddr *)&servaddr, &len);
         if (n <= 0) return;
+
         memcpy(players, buffer, n);
         for (int i = 0; i < n / (int)sizeof(payload); ++i)
         {
