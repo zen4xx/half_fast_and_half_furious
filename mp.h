@@ -46,6 +46,21 @@ public:
         }
         memset(&servaddr, 0, sizeof(servaddr));
         
+        struct timeval timeout = {
+            .tv_sec = 1,
+            .tv_usec = 0
+        };
+
+        if (setsockopt(sockfd,
+                    SOL_SOCKET,
+                    SO_RCVTIMEO,
+                    &timeout,
+                    sizeof(timeout)) == -1) {
+            perror("setsockopt(SO_RCVTIMEO)");
+            close(sockfd);
+            exit(EXIT_FAILURE);
+        }
+
         servaddr.sin_family = AF_INET;
         servaddr.sin_port = htons(PORT);
         servaddr.sin_addr.s_addr = inet_addr(server_ip.c_str());
@@ -104,6 +119,7 @@ public:
 
         int n = recvfrom(sockfd, buffer, MAX_LINE, MSG_WAITALL,
             (struct sockaddr *)&servaddr, &len);
+        if (n <= 0) return;
         memcpy(players, buffer, n);
         for (int i = 0; i < n / (int)sizeof(payload); ++i)
         {

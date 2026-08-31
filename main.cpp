@@ -101,12 +101,7 @@ int main()
 
         std::cout << "write something to start\n";
         std::cin >> ip;
-        mp.start();
-
-        std::cout << "waiting for all players...\n";
-        
-        SLEEP(3);
-        
+        mp.start();        
     }
     
     car.torque_multiplyer = 2.64f;
