@@ -8,6 +8,14 @@
 #include <thread>
 #include <iostream>
 
+#ifdef Windows
+    #include <windows.h>
+    #define SLEEP(x) (Sleep(x * 1000)) 
+#else
+    #include <unistd.h>
+    #define SLEEP(x) (sleep(x))
+#endif 
+
 #include "sound.h"
 #include "mp.h"
 
@@ -94,6 +102,10 @@ int main()
         std::cout << "write something to start\n";
         std::cin >> ip;
         mp.start();
+
+        std::cout << "waiting for all players...\n";
+        
+        SLEEP(3);
         
     }
     
