@@ -33,10 +33,10 @@ struct creation_payload
 class Mp
 {
 public:
-    void set_player(char name[NAME_LEN], char gltf[CREATION_LEN], std::string server_ip, Tiny_engine *engine, std::string scene_name)
+    void set_player(const char name[NAME_LEN], const char gltf[CREATION_LEN], std::string server_ip, Tiny_engine *engine, std::string scene_name)
     {
-        memcpy(crp.name, name, NAME_LEN);
-        memcpy(crp.gltf, gltf, CREATION_LEN);
+        strcpy(crp.name, name);
+        strcpy(crp.gltf, gltf);
 
         sockfd = socket(AF_INET, SOCK_DGRAM, 0);
         if (sockfd < 0)
@@ -55,7 +55,7 @@ public:
         sendto(sockfd, &crp, sizeof(crp), MSG_CONFIRM,
         (const struct sockaddr *)&servaddr, sizeof(servaddr));
 
-        int n = recvfrom(sockfd, buffer, MAX_LINE, MSG_WAITALL,
+        recvfrom(sockfd, buffer, MAX_LINE, MSG_WAITALL,
                             (struct sockaddr *)&servaddr, &len);
 
         crp.index = *(int*)buffer;
@@ -67,19 +67,19 @@ public:
     {
         crp.start = 1;
         memset(buffer, 0, MAX_LINE);
-        std::cout << "sendto\n";
+
         sendto(sockfd, &crp, sizeof(crp), MSG_CONFIRM,
         (const struct sockaddr *)&servaddr, sizeof(servaddr));
 
         int n = recvfrom(sockfd, buffer, MAX_LINE, MSG_WAITALL,
                       (struct sockaddr *)&servaddr, &len);
-        std::cout << "recv\n";
+
         creation_payload *all_crps = (creation_payload*)malloc(n);
         memcpy(all_crps, buffer, n);
 
-        for (int i = 0; i < n / sizeof(creation_payload); ++i)
+        for (int i = 0; i < n / (int)sizeof(creation_payload); ++i)
         {
-            std::cout << "obj\n";
+            std::cout << i << std::endl;
             tiny_engine::Object obj;
             obj.obj_name = all_crps[i].name;
             obj.scene_name = this->scene_name;
@@ -88,7 +88,7 @@ public:
 
             engine->addObject(obj);
         }
-
+        players = (payload*)malloc(n/sizeof(creation_payload) * sizeof(payload));
         free(all_crps);
     };
 
@@ -101,20 +101,18 @@ public:
         
         sendto(sockfd, &p, sizeof(p), MSG_CONFIRM,
         (const struct sockaddr *)&servaddr, sizeof(servaddr));
-        memset(buffer, 0, MAX_LINE);
+
         int n = recvfrom(sockfd, buffer, MAX_LINE, MSG_WAITALL,
             (struct sockaddr *)&servaddr, &len);
-        payload* players = (payload*)malloc(n);
         memcpy(players, buffer, n);
-        for (int i = 0; i < n / sizeof(payload); ++i)
+        for (int i = 0; i < n / (int)sizeof(payload); ++i)
         {
             engine->moveObject(scene_name, players[i].name, players[i].mat);
         }    
-        free(players);
         
     }
 
-    ~Mp() { close(sockfd); };
+    ~Mp() { close(sockfd); free(players); };
 
 private:
     int sockfd;
@@ -122,6 +120,7 @@ private:
     struct sockaddr_in servaddr;
     socklen_t len;
     creation_payload crp;
+    payload *players;
     Tiny_engine *engine;
     std::string scene_name;
 };

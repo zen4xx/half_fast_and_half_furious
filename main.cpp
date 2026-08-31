@@ -59,36 +59,43 @@ int main()
     plane.pos = glm::scale(glm::rotate(glm::mat4(1), glm::radians(-180.f), glm::vec3(0.f, 0.f, 1.f)), glm::vec3(50.f));
 
     tiny_engine::Object mustang;
-    mustang.scene_name = "main";
-    mustang.obj_name = "mustang";
-    mustang.gltf_model_path = "cars/mustang/mustang.gltf";
-    mustang.pos = glm::translate(glm::mat4(1), glm::vec3(0.f));
 
     engine.addObject(plane);
 
     Mp mp;
     bool is_mp;
-    std::cout << "is mp: ";
+    std::cout << "is multiplayer 1/0: ";
     std::cin >> is_mp;
 
-    if (is_mp == 0)
+    Car car;
+    
+    if (is_mp == 0){
+        mustang.scene_name = "main";
+        mustang.obj_name = "mustang";
+        mustang.gltf_model_path = "cars/mustang/mustang.gltf";
+        mustang.pos = glm::translate(glm::mat4(1), glm::vec3(0.f));
+
         engine.addObject(mustang);
+        car.set("main", "mustang", &engine, glm::vec3(0.0f, 1.0f, 0.0f), glm::rotate(glm::mat4(1.f), glm::radians(180.f), glm::vec3(1.0f, 0.0f, 0.0f)));
+    }
 
     else 
     {
-        std::string ip;
+        std::string ip, name;
         std::cout << "enter server ip: ";
         std::cin >> ip;
-        mp.set_player("mustang", "cars/mustang/mustang.gltf", ip, &engine, "main");
+        std::cout << "enter your name: ";
+        std::cin >> name;
+        
+        mp.set_player(name.c_str(), (char*)"cars/mustang/mustang.gltf", ip, &engine, "main");
+    
+        car.set("main", name, &engine, glm::vec3(0.0f, 1.0f, 0.0f), glm::rotate(glm::mat4(1.f), glm::radians(180.f), glm::vec3(1.0f, 0.0f, 0.0f)));
 
         std::cout << "write something to start\n";
         std::cin >> ip;
         mp.start();
         
     }
-    Car car;
-
-    car.set("main", "mustang", &engine, glm::vec3(0.0f, 1.0f, 0.0f), glm::rotate(glm::mat4(1.f), glm::radians(180.f), glm::vec3(1.0f, 0.0f, 0.0f)));
     
     car.torque_multiplyer = 2.64f;
     car.weight = 1900.f;
