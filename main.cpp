@@ -67,6 +67,8 @@ int main()
     std::cin >> is_mp;
 
     Car car;
+    car.torque_multiplyer = 2.64f;
+    car.weight = 1900.f;
     
     if (is_mp == 0){
         mustang.scene_name = "main";
@@ -95,8 +97,6 @@ int main()
         mp.start();        
     }
     
-    car.torque_multiplyer = 2.64f;
-    car.weight = 1900.f;
 
     bool key_1 = 0, key_2 = 0, free_cam = 0, third_person_cam = 0; // toggles
 

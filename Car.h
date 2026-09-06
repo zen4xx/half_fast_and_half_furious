@@ -20,6 +20,9 @@ public:
         m_pos = pos;
         m_world_up = world_up;
         m_original_rotation = rotation;
+
+        air_resistance = frontal_area * 1.225 * 0.5 * 0.3;
+        rolling_resistance = 0.015 * weight * g;
     };
 
     void accelerate(double dt);
@@ -33,7 +36,6 @@ public:
     float torque_multiplyer = 1;
     int weight = 1000; // kg
     float max_RPM = 7000;
-    int gears_num = 7; // R + N + 5
     
     float driven_weight = weight * 0.6;
 
@@ -49,8 +51,8 @@ public:
 
     float max_brake_force = 15000.f; // N
 
-    float air_resistance = frontal_area * 1.225 * 0.5 * 0.3;
-    float rolling_resistance = 0.015 * weight * g;
+    float air_resistance;
+    float rolling_resistance;
 
     std::vector<float> gears = {
         -4,   // R
@@ -61,7 +63,7 @@ public:
         1.00, // 4
         0.80  // 5
     };
-    
+
     float speed = 0.f; //m/s
     
     float RPM = 1000;
