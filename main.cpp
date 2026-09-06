@@ -7,15 +7,6 @@
 #include <string>
 #include <thread>
 #include <iostream>
-
-#ifdef Windows
-    #include <windows.h>
-    #define SLEEP(x) (Sleep(x * 1000)) 
-#else
-    #include <unistd.h>
-    #define SLEEP(x) (sleep(x))
-#endif 
-
 #include "sound.h"
 #include "mp.h"
 
