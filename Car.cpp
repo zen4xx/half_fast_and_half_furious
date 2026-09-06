@@ -96,7 +96,7 @@ void Car::accelerate(double dt)
     else totalForce = wheelForce + this->rolling_resistance;
 
     float acceleration =
-        wheelForce / this->weight;
+        totalForce / this->weight;
 
     this->speed += acceleration * dt;
 }
@@ -187,21 +187,17 @@ void Car::update(double dt)
 
 void Car::turn(dir d, double dt)
 {
-
-    if (this->speed != 0)
+    if (d == right)
     {
-        if (d == right)
-        {
-            if (abs(this->speed * 10) < turn_angle)
-                this->m_yaw += dt * this->speed * 10;  
-            else this->m_yaw += turn_angle * dt;
-        }
-        else if (d == left)
-        {
-            if (abs(this->speed * 10) < turn_angle)
-                this->m_yaw -= dt * this->speed * 10;
-            else this->m_yaw -= turn_angle * dt;
-        }
+        if (abs(this->speed * 10) < turn_angle)
+            this->m_yaw += dt * this->speed * 10;  
+        else this->m_yaw += turn_angle * dt;
+    }
+    else if (d == left)
+    {
+        if (abs(this->speed * 10) < turn_angle)
+            this->m_yaw -= dt * this->speed * 10;
+        else this->m_yaw -= turn_angle * dt;
     }
 }
 
