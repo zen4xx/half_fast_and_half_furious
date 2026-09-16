@@ -39,6 +39,7 @@ struct payload
     int index;
     char name[NAME_LEN];
     glm::mat4 mat;
+    glm::vec3 hpos; // helmet pos (if gamemode is 1)
 };
 
 struct creation_payload
@@ -47,6 +48,7 @@ struct creation_payload
     char name[NAME_LEN];
     char gltf[CREATION_LEN];
     char start = 0; 
+    char game_mode = 0; // 0 is without any modes, 1 is catch the helmet
 };
 
 class Mp
@@ -66,10 +68,12 @@ public:
         players = nullptr;
     }
 
-    void set_player(const char name[NAME_LEN], const char gltf[CREATION_LEN], std::string server_ip, Tiny_engine *engine, std::string scene_name)
+    void set_player(const char name[NAME_LEN], const char gltf[CREATION_LEN], std::string server_ip, Tiny_engine *engine, std::string scene_name, char game_mode)
     {
         strcpy(crp.name, name);
         strcpy(crp.gltf, gltf);
+
+        crp.game_mode = game_mode;
 
         sockfd = socket(AF_INET, SOCK_DGRAM, 0);
 #ifdef _WIN32
@@ -147,6 +151,10 @@ public:
 
             engine->addObject(obj);
         }
+
+        if (crp.game_mode == 1) // catch the helmet
+            engine->addObject(this->scene_name, "helmet", "damaged_helmet/DamagedHelmet.gltf", glm::rotate(glm::mat4(1), glm::radians(-90.f), glm::vec3(1, 0, 0)), "damaged_helmet/Default_albedo.jpg", "damaged_helmet/Default_metalRoughness.jpg", "damaged_helmet/Default_normal.jpg");
+
         players = (payload*)malloc(num_players * sizeof(payload));
         free(all_crps);
     }
@@ -170,6 +178,15 @@ public:
         {
             engine->moveObject(scene_name, players[i].name, players[i].mat);
         }    
+
+        if (crp.game_mode == 1)
+        {
+            glm::mat4 hmodel(1.0f);
+            hmodel = glm::translate(hmodel, players[0].hpos);
+            hmodel = glm::rotate(hmodel, glm::radians(-90.f), glm::vec3(1, 0, 0));
+            hmodel = glm::rotate(hmodel, glm::radians((float)glfwGetTime() * 50.f), glm::vec3(0, 0, 1));
+            engine->moveObject(scene_name, "helmet", hmodel);
+        }
     }
 
     ~Mp() { 

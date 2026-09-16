@@ -83,12 +83,15 @@ int main()
     else 
     {
         std::string ip, name;
+        int gamemode;
         std::cout << "enter server ip: ";
         std::cin >> ip;
         std::cout << "enter your name: ";
         std::cin >> name;
+        std::cout << "enter the gamemode (0 is without any gamemodes, 1 is catch the helmet): ";
+        std::cin >> gamemode;
         
-        mp.set_player(name.c_str(), (char*)"cars/mustang/mustang.gltf", ip, &engine, "main");
+        mp.set_player(name.c_str(), (char*)"cars/mustang/mustang.gltf", ip, &engine, "main", char(gamemode));
     
         car.set("main", name, &engine, glm::vec3(0.0f, 1.0f, 0.0f), glm::rotate(glm::mat4(1.f), glm::radians(180.f), glm::vec3(1.0f, 0.0f, 0.0f)));
 
