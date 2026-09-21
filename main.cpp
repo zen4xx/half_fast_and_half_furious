@@ -1,10 +1,6 @@
-#include "renderer/renderer.h"
-#include "renderer/renderer_util.h"
 #include "tiny_engine.h"
 #include "camera.h"
 #include "Car.h"
-#include <glm/ext/matrix_transform.hpp>
-#include <string>
 #include <thread>
 #include <iostream>
 #include "sound.h"
@@ -45,6 +41,8 @@ int main()
 
     engine.createScene("main");
     engine.setDirLight("main", glm::vec3(2.0f, 0.5f, 2.0f));
+    engine.setDirLightColor("main", glm::vec3(1.8f, 1.69f, 1.46f));    
+    engine.setAmbient("main", glm::vec3(0.12f, 0.14f, 0.18f));
     engine.setDrawDistance("main", 100.f);
     engine.setView("main", camera.GetViewMatrix());
 
