@@ -41,7 +41,7 @@ int main() {
     engine.setDirLight("main", glm::vec3(2.0f, 0.5f, 2.0f));
     engine.setDirLightColor("main", glm::vec3(1.8f, 1.69f, 1.46f));    
     engine.setAmbient("main", glm::vec3(0.12f, 0.14f, 0.18f));
-    engine.setDrawDistance("main", 100.f);
+    engine.setDrawDistance("main", 1000.f);
     engine.setView("main", camera.GetViewMatrix());
 
     tiny_engine::Object plane;

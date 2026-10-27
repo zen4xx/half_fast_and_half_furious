@@ -7,6 +7,13 @@ include(FetchContent)
 
 set(TINY_ENGINE_NO_EXAMPLES ON CACHE BOOL "")
 
+set(SHADER_DEFINES
+    "USE_NORMAL_MAP"
+   #  "USE_MR_RED_AS_AO"
+    "TONE_MAPPING"
+    CACHE STRING "Shader defines passed to Tiny_engine glslc"
+)
+
 FetchContent_Declare(
    Tiny_engine
    GIT_REPOSITORY https://github.com/zen4xx/tiny_engine.git
