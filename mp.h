@@ -4,6 +4,8 @@
 #include <cstring>
 #include <string>
 #include <iostream>
+#include <vector>
+#include <map>
 
 #ifdef _WIN32
     #include <winsock2.h>
@@ -34,16 +36,14 @@
 #define NAME_LEN     20
 #define CREATION_LEN 50
 
-struct payload
-{
+struct payload {
     int index;
     char name[NAME_LEN];
     glm::mat4 mat;
     glm::vec3 hpos; // helmet pos (if gamemode is 1)
 };
 
-struct creation_payload
-{
+struct creation_payload {
     int index = -1;
     char name[NAME_LEN];
     char gltf[CREATION_LEN];
@@ -51,8 +51,7 @@ struct creation_payload
     char game_mode = 0; // 0 is without any modes, 1 is catch the helmet
 };
 
-class Mp
-{
+class Mp {
 public:
     Mp() {
 #ifdef _WIN32
@@ -68,35 +67,20 @@ public:
         players = nullptr;
     }
 
-    void set_player(const char name[NAME_LEN], const char gltf[CREATION_LEN], std::string server_ip, Tiny_engine *engine, std::string scene_name, char game_mode)
-    {
+    void set_player(const char name[NAME_LEN], const char gltf[CREATION_LEN], std::string server_ip, Tiny_engine *engine, std::string scene_name, char game_mode) {
         strcpy(crp.name, name);
         strcpy(crp.gltf, gltf);
-
         crp.game_mode = game_mode;
 
         sockfd = socket(AF_INET, SOCK_DGRAM, 0);
-#ifdef _WIN32
-        if (sockfd == INVALID_SOCKET)
-#else
-        if (sockfd < 0)
-#endif
-        {
+        if (sockfd < 0) {
             perror("socket creation failed");
             exit(EXIT_FAILURE);
         }
         memset(&servaddr, 0, sizeof(servaddr));
         
-#ifdef _WIN32
-        DWORD timeout = 1000; 
-        if (setsockopt(sockfd, SOL_SOCKET, SO_RCVTIMEO, (const char*)&timeout, sizeof(timeout)) == SOCKET_ERROR) {
-#else
-        struct timeval timeout = {
-            .tv_sec = 1,
-            .tv_usec = 0
-        };
+        struct timeval timeout = { .tv_sec = 1, .tv_usec = 0 };
         if (setsockopt(sockfd, SOL_SOCKET, SO_RCVTIMEO, (const char*)&timeout, sizeof(timeout)) == -1) {
-#endif
             perror("setsockopt(SO_RCVTIMEO)");
             CLOSE_SOCKET(sockfd);
             exit(EXIT_FAILURE);
@@ -105,14 +89,11 @@ public:
         servaddr.sin_family = AF_INET;
         servaddr.sin_port = htons(PORT);
         servaddr.sin_addr.s_addr = inet_addr(server_ip.c_str());
-
         len = sizeof(servaddr);
 
-        sendto(sockfd, (const char*)&crp, (int)sizeof(crp), SEND_FLAGS,
-               (const struct sockaddr *)&servaddr, len);
+        sendto(sockfd, (const char*)&crp, (int)sizeof(crp), SEND_FLAGS, (const struct sockaddr *)&servaddr, len);
 
-        int n = recvfrom(sockfd, buffer, (int)MAX_LINE, RECV_FLAGS,
-                         (struct sockaddr *)&servaddr, &len);
+        int n = recvfrom(sockfd, buffer, (int)MAX_LINE, RECV_FLAGS, (struct sockaddr *)&servaddr, &len);
         if (n <= 0) {
             std::cerr << "Failed to receive response from server" << std::endl;
             CLOSE_SOCKET(sockfd);
@@ -124,96 +105,96 @@ public:
         this->scene_name = scene_name;
     }
 
-    void start()
-    {
+    void start() {
         crp.start = 1;
         memset(buffer, 0, MAX_LINE);
 
-        sendto(sockfd, (const char*)&crp, (int)sizeof(crp), SEND_FLAGS,
-               (const struct sockaddr *)&servaddr, len);
+        sendto(sockfd, (const char*)&crp, (int)sizeof(crp), SEND_FLAGS, (const struct sockaddr *)&servaddr, len);
 
-        int n = recvfrom(sockfd, buffer, (int)MAX_LINE, RECV_FLAGS,
-                         (struct sockaddr *)&servaddr, &len);
+        int n = recvfrom(sockfd, buffer, (int)MAX_LINE, RECV_FLAGS, (struct sockaddr *)&servaddr, &len);
         if (n <= 0) return;
 
         creation_payload *all_crps = (creation_payload*)malloc(n);
         memcpy(all_crps, buffer, n);
 
         int num_players = n / (int)sizeof(creation_payload);
-        for (int i = 0; i < num_players; ++i)
-        {
-            std::cout << i << std::endl;
+        for (int i = 0; i < num_players; ++i) {
             tiny_engine::Object obj;
-            obj.obj_name = all_crps[i].name;
             obj.scene_name = this->scene_name;
             obj.pos = glm::mat4(1);
             obj.gltf_model_path = all_crps[i].gltf;
 
-            engine->addObject(obj);
+            size_t obj_id = engine->addObject(obj);
+            index_to_obj_id[all_crps[i].index] = obj_id;
+            
+            if (all_crps[i].index == crp.index) {
+                local_player_obj_id = obj_id;
+            }
         }
 
-        if (crp.game_mode == 1) // catch the helmet
-            engine->addObject(this->scene_name, "helmet", "damaged_helmet/DamagedHelmet.gltf", glm::rotate(glm::mat4(1), glm::radians(-90.f), glm::vec3(1, 0, 0)), "damaged_helmet/Default_albedo.jpg", "damaged_helmet/Default_metalRoughness.jpg", "damaged_helmet/Default_normal.jpg");
+        if (crp.game_mode == 1) { // catch the helmet
+            helmet_obj_id = engine->addObject(
+                this->scene_name, 
+                "damaged_helmet/DamagedHelmet.gltf", 
+                glm::rotate(glm::mat4(1), glm::radians(-90.f), glm::vec3(1, 0, 0)), 
+                "damaged_helmet/Default_albedo.jpg", 
+                "damaged_helmet/Default_metalRoughness.jpg", 
+                "damaged_helmet/Default_normal.jpg"
+            );
+        }
 
         players = (payload*)malloc(num_players * sizeof(payload));
         free(all_crps);
     }
 
-    void update(glm::mat4 mat)
-    {
+    void update(glm::mat4 mat) {
         payload p;
         p.mat = mat;
         p.index = crp.index;        
         memcpy(p.name, crp.name, NAME_LEN);
         
-        sendto(sockfd, (const char*)&p, (int)sizeof(p), SEND_FLAGS,
-               (const struct sockaddr *)&servaddr, len);
+        sendto(sockfd, (const char*)&p, (int)sizeof(p), SEND_FLAGS, (const struct sockaddr *)&servaddr, len);
 
-        int n = recvfrom(sockfd, buffer, (int)MAX_LINE, RECV_FLAGS,
-                         (struct sockaddr *)&servaddr, &len);
+        int n = recvfrom(sockfd, buffer, (int)MAX_LINE, RECV_FLAGS, (struct sockaddr *)&servaddr, &len);
         if (n <= 0) return;
 
         memcpy(players, buffer, n);
-        for (int i = 0; i < n / (int)sizeof(payload); ++i)
-        {
-            engine->moveObject(scene_name, players[i].name, players[i].mat);
+        int num_players = n / (int)sizeof(payload);
+        
+        for (int i = 0; i < num_players; ++i) {
+            auto it = index_to_obj_id.find(players[i].index);
+            if (it != index_to_obj_id.end()) {
+                engine->moveObject(scene_name, it->second, players[i].mat);
+            }
         }    
 
-        if (crp.game_mode == 1)
-        {
+        if (crp.game_mode == 1 && helmet_obj_id != 0) {
             glm::mat4 hmodel(1.0f);
             hmodel = glm::translate(hmodel, players[0].hpos);
             hmodel = glm::rotate(hmodel, glm::radians(-90.f), glm::vec3(1, 0, 0));
             hmodel = glm::rotate(hmodel, glm::radians((float)glfwGetTime() * 50.f), glm::vec3(0, 0, 1));
-            engine->moveObject(scene_name, "helmet", hmodel);
+            engine->moveObject(scene_name, helmet_obj_id, hmodel);
         }
     }
 
+    size_t get_local_player_obj_id() const { return local_player_obj_id; }
+
     ~Mp() { 
-#ifdef _WIN32
-        if (sockfd != INVALID_SOCKET) {
-            closesocket(sockfd);
-        }
-        WSACleanup();
-#else
-        if (sockfd >= 0) {
-            close(sockfd);
-        }
-#endif
+        if (sockfd >= 0) CLOSE_SOCKET(sockfd);
         free(players); 
     }
 
 private:
-#ifdef _WIN32
-    SOCKET sockfd;
-#else
     int sockfd;
-#endif
     char buffer[MAX_LINE];
     struct sockaddr_in servaddr;
     socklen_t len;
     creation_payload crp;
     payload *players;
+    
+    std::map<int, size_t> index_to_obj_id;
+    size_t local_player_obj_id = 0;
+    size_t helmet_obj_id = 0;
     Tiny_engine *engine;
     std::string scene_name;
 };

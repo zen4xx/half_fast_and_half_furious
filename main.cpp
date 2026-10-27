@@ -28,10 +28,8 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
     camera.ProcessMouseMovement(xoffset, yoffset);
 }
 
-int main()
-{
+int main() {
     uint8_t thread_count = std::thread::hardware_concurrency();
-    
     auto engine = Tiny_engine(GAME_NAME, 1920, 1080, GAME_NAME, TINY_ENGINE_MAX_MSAA_QUALITY, thread_count, true);
 
     glfwSetCursorPosCallback(engine.getWindow(), mouse_callback);
@@ -48,14 +46,11 @@ int main()
 
     tiny_engine::Object plane;
     plane.scene_name = "main";
-    plane.obj_name = "plane";
     plane.albedo_path = "plane/TwoSidedPlane_BaseColor.png";
     plane.mr_path = "plane/TwoSidedPlane_MetallicRoughness.png";
     plane.normal_path = "plane/TwoSidedPlane_Normal.png";
     plane.gltf_model_path = "plane/TwoSidedPlane.gltf";
     plane.pos = glm::scale(glm::rotate(glm::mat4(1), glm::radians(-180.f), glm::vec3(0.f, 0.f, 1.f)), glm::vec3(50.f));
-
-    tiny_engine::Object mustang;
 
     engine.addObject(plane);
 
@@ -68,18 +63,16 @@ int main()
     car.torque_multiplyer = 2.64f;
     car.weight = 1900.f;
     
-    if (is_mp == 0){
+    if (is_mp == 0) {
+        tiny_engine::Object mustang;
         mustang.scene_name = "main";
-        mustang.obj_name = "mustang";
         mustang.gltf_model_path = "cars/mustang/mustang.gltf";
         mustang.pos = glm::translate(glm::mat4(1), glm::vec3(0.f));
 
-        engine.addObject(mustang);
-        car.set("main", "mustang", &engine, glm::vec3(0.0f, 1.0f, 0.0f), glm::rotate(glm::mat4(1.f), glm::radians(180.f), glm::vec3(1.0f, 0.0f, 0.0f)));
+        size_t mustang_id = engine.addObject(mustang);
+        car.set("main", mustang_id, &engine, glm::vec3(0.0f, 1.0f, 0.0f), glm::rotate(glm::mat4(1.f), glm::radians(180.f), glm::vec3(1.0f, 0.0f, 0.0f)));
     }
-
-    else 
-    {
+    else {
         std::string ip, name;
         int gamemode;
         std::cout << "enter server ip: ";
@@ -91,51 +84,52 @@ int main()
         
         mp.set_player(name.c_str(), (char*)"cars/mustang/mustang.gltf", ip, &engine, "main", char(gamemode));
     
-        car.set("main", name, &engine, glm::vec3(0.0f, 1.0f, 0.0f), glm::rotate(glm::mat4(1.f), glm::radians(180.f), glm::vec3(1.0f, 0.0f, 0.0f)));
-
         std::cout << "write something to start\n";
         std::cin >> ip;
-        mp.start();        
+        mp.start();
+        
+        car.set("main", mp.get_local_player_obj_id(), &engine, glm::vec3(0.0f, 1.0f, 0.0f), glm::rotate(glm::mat4(1.f), glm::radians(180.f), glm::vec3(1.0f, 0.0f, 0.0f)));
     }
-    
 
-    bool key_1 = 0, key_2 = 0, free_cam = 0, third_person_cam = 0; // toggles
-
+    bool key_1 = 0, key_2 = 0, free_cam = 0, third_person_cam = 0;
     bool is_free_cam = 0;
-
     glm::vec3 car_tail_pos = glm::vec3(0);
 
     Sound_engine sound_engine;
     sound_engine.start();
 
     while (engine.isWindowOpen()){
-        if (engine.isKeyPressed(GLFW_KEY_W))
-            camera.ProcessKeyboard(GLFW_KEY_W, engine.getDeltaTime());
-        if (engine.isKeyPressed(GLFW_KEY_S))
-            camera.ProcessKeyboard(GLFW_KEY_S, engine.getDeltaTime());
-        if (engine.isKeyPressed(GLFW_KEY_D))
-            camera.ProcessKeyboard(GLFW_KEY_D, engine.getDeltaTime());
-        if (engine.isKeyPressed(GLFW_KEY_A))
-            camera.ProcessKeyboard(GLFW_KEY_A, engine.getDeltaTime());
+        if (engine.isKeyPressed(GLFW_KEY_W)) camera.ProcessKeyboard(GLFW_KEY_W, engine.getDeltaTime());
+        if (engine.isKeyPressed(GLFW_KEY_S)) camera.ProcessKeyboard(GLFW_KEY_S, engine.getDeltaTime());
+        if (engine.isKeyPressed(GLFW_KEY_D)) camera.ProcessKeyboard(GLFW_KEY_D, engine.getDeltaTime());
+        if (engine.isKeyPressed(GLFW_KEY_A)) camera.ProcessKeyboard(GLFW_KEY_A, engine.getDeltaTime());
 
         if (engine.isKeyPressed(GLFW_KEY_F)) std::cout << engine.getFPSCount() << std::endl;
 
         if (engine.isKeyPressed(GLFW_KEY_UP)) { car.accelerate(engine.getDeltaTime()); sound_engine.setThrottle(1.f); }
         else { car.engine_brake(engine.getDeltaTime()); sound_engine.setThrottle(0.f); }
+        
         if (engine.isKeyPressed(GLFW_KEY_DOWN)) car.brake(engine.getDeltaTime());
         if (engine.isKeyPressed(GLFW_KEY_RIGHT)) car.turn(right, engine.getDeltaTime());
         if (engine.isKeyPressed(GLFW_KEY_LEFT)) car.turn(left, engine.getDeltaTime());
 
         if (engine.isKeyPressed(GLFW_KEY_1)) key_1 = 1;
-        else if (!engine.isKeyPressed(GLFW_KEY_1) && key_1 == 1) {key_1 = 0; car.gear--; }
+        else if (!engine.isKeyPressed(GLFW_KEY_1) && key_1 == 1) { key_1 = 0; car.gear--; }
+        
         if (engine.isKeyPressed(GLFW_KEY_2)) key_2 = 1;
-        else if (!engine.isKeyPressed(GLFW_KEY_2) && key_2 == 1) {key_2 = 0; car.gear++; }
+        else if (!engine.isKeyPressed(GLFW_KEY_2) && key_2 == 1) { key_2 = 0; car.gear++; }
+        
         if (engine.isKeyPressed(GLFW_KEY_C)) free_cam = 1;
-        else if (!engine.isKeyPressed(GLFW_KEY_C) && free_cam == 1) {free_cam = 0; is_free_cam = 1; camera.Position = glm::vec3(car_tail_pos.x, car_tail_pos.y - 1.5f, -car_tail_pos.z); camera.Yaw = car.m_yaw - 90.f; camera.updateCameraVectors(); }
+        else if (!engine.isKeyPressed(GLFW_KEY_C) && free_cam == 1) {
+            free_cam = 0; is_free_cam = 1; 
+            camera.Position = glm::vec3(car_tail_pos.x, car_tail_pos.y - 1.5f, -car_tail_pos.z); 
+            camera.Yaw = car.m_yaw - 90.f; 
+            camera.updateCameraVectors(); 
+        }
+        
         if (engine.isKeyPressed(GLFW_KEY_X)) third_person_cam = 1;
-        else if (!engine.isKeyPressed(GLFW_KEY_X) && third_person_cam == 1) {third_person_cam = 0; is_free_cam = 0; }
-        
-        
+        else if (!engine.isKeyPressed(GLFW_KEY_X) && third_person_cam == 1) { third_person_cam = 0; is_free_cam = 0; }
+
         std::cout << "RPM: " << car.RPM << std::endl;
         std::cout << "speed km/h: " << car.speed * 3.6 << std::endl;
         std::cout << "gear: " << car.gear - 1 << std::endl;
@@ -144,9 +138,7 @@ int main()
 
         if (is_free_cam)
             engine.setView("main", camera.GetViewMatrix());
-
-        else 
-        {
+        else {
             if (car.gear != 0)
                 car_tail_pos = car.m_pos - (car.m_front * 3.f * ((car.speed/50)+1.f));
             else 
@@ -157,9 +149,10 @@ int main()
         
         if (is_mp)
             mp.update(glm::rotate(glm::translate(glm::rotate(glm::mat4(1.f), glm::radians(180.f), glm::vec3(1.0f, 0.0f, 0.0f)), car.m_pos), glm::radians(car.m_yaw), glm::vec3(0.f, 1.f, 0.f)));
+            
         sound_engine.setRPM(car.RPM);
         engine.update();
         engine.drawScene("main");
     }
-
+    return 0;
 }

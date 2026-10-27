@@ -4,7 +4,7 @@
 #include <vector>
 #include <string>
 
-enum dir{
+enum dir {
     right,
     left,
 };
@@ -12,10 +12,10 @@ enum dir{
 class Car 
 {
 public:
-    inline void set(const std::string &scene_name, const std::string &obj_name, Tiny_engine *engine, glm::vec3 world_up, glm::mat4 rotation, glm::vec3 pos = glm::vec3(0)) 
+    inline void set(const std::string &scene_name, size_t obj_id, Tiny_engine *engine, glm::vec3 world_up, glm::mat4 rotation, glm::vec3 pos = glm::vec3(0)) 
     {
         m_scene_name = scene_name;
-        m_obj_name = obj_name;
+        m_obj_id = obj_id;
         m_engine = engine; 
         m_pos = pos;
         m_world_up = world_up;
@@ -64,22 +64,19 @@ public:
         0.80  // 5
     };
 
-    float speed = 0.f; //m/s
-    
+    float speed = 0.f; // m/s
     float RPM = 1000;
-    
     int gear = 2; // 1 is N (cause 0 is R)
-
     float turn_angle = 70;
     
 public:
     Tiny_engine *m_engine = nullptr;
-    std::string m_scene_name = "", m_obj_name = "";
+    std::string m_scene_name = "";
+    size_t m_obj_id = 0;
     
     glm::vec3 m_pos = glm::vec3(0);
     float m_yaw = 0.f;
     glm::vec3 m_front, m_right, m_world_up;
 
     glm::mat4 m_original_rotation;
-
 };
