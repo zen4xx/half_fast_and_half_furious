@@ -171,8 +171,8 @@ public:
         if (crp.game_mode == 1 && helmet_obj_id != 0) {
             glm::mat4 hmodel(1.0f);
             hmodel = glm::translate(hmodel, players[0].hpos);
-            hmodel = glm::rotate(hmodel, glm::radians(-90.f), glm::vec3(1, 0, 0));
-            hmodel = glm::rotate(hmodel, glm::radians((float)glfwGetTime() * 50.f), glm::vec3(0, 0, 1));
+            hmodel = glm::rotate(hmodel, glm::radians(180.f), glm::vec3(0, 0, 1));
+            hmodel = glm::rotate(hmodel, glm::radians((float)glfwGetTime() * 50.f), glm::vec3(0, 1, 0));
             engine->moveObject(scene_name, helmet_obj_id, hmodel);
         }
     }

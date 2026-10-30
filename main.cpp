@@ -41,7 +41,7 @@ int main() {
     engine.setDirLight("main", glm::vec3(2.0f, 0.5f, 2.0f));
     engine.setDirLightColor("main", glm::vec3(1.8f, 1.69f, 1.46f));    
     engine.setAmbient("main", glm::vec3(0.12f, 0.14f, 0.18f));
-    engine.setDrawDistance("main", 1000.f);
+    engine.setDrawDistance("main", 100.f);
     engine.setView("main", camera.GetViewMatrix());
 
     tiny_engine::Object plane;
@@ -67,6 +67,10 @@ int main() {
         tiny_engine::Object mustang;
         mustang.scene_name = "main";
         mustang.gltf_model_path = "cars/mustang/mustang.gltf";
+        // mustang.gltf_model_path = "cars/ferrari_f40/ferrari_f40.gltf";
+        // mustang.albedo_path = "cars/ferrari_f40/ferrari_aslbedo.png";
+        // mustang.mr_path = "cars/ferrari_f40/ferrari_mr.png";
+        // mustang.normal_path = "cars/ferrari_f40/ferrari_nrm.png";
         mustang.pos = glm::translate(glm::mat4(1), glm::vec3(0.f));
 
         size_t mustang_id = engine.addObject(mustang);
