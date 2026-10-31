@@ -39,7 +39,7 @@ public:
     
     float driven_weight = weight * 0.6;
 
-    float friction = 0.90; 
+    float friction = 2.f; 
     float wheel_radius = 0.254; // m 
 
     float g = 9.81; // m/s^2

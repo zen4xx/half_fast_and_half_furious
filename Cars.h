@@ -182,6 +182,7 @@ inline void set_supra(Car& car)
         0.793f  // 6
     };
     car.turn_angle = 65;
+    car.max_brake_force = 25000;
 }
 
 
