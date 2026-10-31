@@ -1,3 +1,4 @@
+#include "renderer/renderer.h"
 #include "tiny_engine.h"
 #include "camera.h"
 #include "Car.h"
@@ -5,6 +6,7 @@
 #include <iostream>
 #include "sound.h"
 #include "mp.h"
+#include "Cars.h"
 
 #define GAME_NAME "half fast & half furious"
 
@@ -59,21 +61,18 @@ int main() {
     std::cout << "is multiplayer 1/0: ";
     std::cin >> is_mp;
 
-    Car car;
-    car.torque_multiplyer = 2.64f;
-    car.weight = 1900.f;
-    
-    if (is_mp == 0) {
-        tiny_engine::Object mustang;
-        mustang.scene_name = "main";
-        // mustang.gltf_model_path = "cars/mustang/mustang.gltf";
-        mustang.gltf_model_path = "cars/ferrari_f40/ferrari_f40.gltf";
-        mustang.albedo_path = "cars/ferrari_f40/ferrari_aslbedo.png";
-        mustang.mr_path = "cars/ferrari_f40/ferrari_mr.png";
-        mustang.normal_path = "cars/ferrari_f40/ferrari_nrm.png";
-        mustang.pos = glm::translate(glm::mat4(1), glm::vec3(0.f));
+    int car_index;
+    std::cout << "choose car from 0 to 4: ";
+    std::cin >> car_index;
 
-        size_t mustang_id = engine.addObject(mustang);
+    Car car;
+    
+    set_car(car_index, car);
+
+    if (is_mp == 0) {
+        tiny_engine::Object car_obj = create_car_obj(car_index, "main");
+        std::cout << car_obj.albedo_path << std::endl;
+        size_t mustang_id = engine.addObject(car_obj);
         car.set("main", mustang_id, &engine, glm::vec3(0.0f, 1.0f, 0.0f), glm::rotate(glm::mat4(1.f), glm::radians(180.f), glm::vec3(1.0f, 0.0f, 0.0f)));
     }
     else {
@@ -86,7 +85,7 @@ int main() {
         std::cout << "enter the gamemode (0 is without any gamemodes, 1 is catch the helmet): ";
         std::cin >> gamemode;
         
-        mp.set_player(name.c_str(), (char*)"cars/mustang/mustang.gltf", ip, &engine, "main", char(gamemode));
+        mp.set_player(name.c_str(), car_index, ip, &engine, "main", char(gamemode));
     
         std::cout << "write something to start\n";
         std::cin >> ip;

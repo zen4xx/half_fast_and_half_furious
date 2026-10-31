@@ -1,4 +1,5 @@
 // multiplayer
+#include "renderer/renderer.h"
 #include "tiny_engine.h"
 #include <cstdlib>
 #include <cstring>
@@ -6,6 +7,7 @@
 #include <iostream>
 #include <vector>
 #include <map>
+#include "Cars.h"
 
 #ifdef _WIN32
     #include <winsock2.h>
@@ -46,7 +48,7 @@ struct payload {
 struct creation_payload {
     int index = -1;
     char name[NAME_LEN];
-    char gltf[CREATION_LEN];
+    char car;
     char start = 0; 
     char game_mode = 0; // 0 is without any modes, 1 is catch the helmet
 };
@@ -67,9 +69,9 @@ public:
         players = nullptr;
     }
 
-    void set_player(const char name[NAME_LEN], const char gltf[CREATION_LEN], std::string server_ip, Tiny_engine *engine, std::string scene_name, char game_mode) {
+    void set_player(const char name[NAME_LEN], char car, std::string server_ip, Tiny_engine *engine, std::string scene_name, char game_mode) {
         strcpy(crp.name, name);
-        strcpy(crp.gltf, gltf);
+        crp.car = car;
         crp.game_mode = game_mode;
 
         sockfd = socket(AF_INET, SOCK_DGRAM, 0);
@@ -119,12 +121,10 @@ public:
 
         int num_players = n / (int)sizeof(creation_payload);
         for (int i = 0; i < num_players; ++i) {
-            tiny_engine::Object obj;
-            obj.scene_name = this->scene_name;
-            obj.pos = glm::mat4(1);
-            obj.gltf_model_path = all_crps[i].gltf;
 
-            size_t obj_id = engine->addObject(obj);
+            tiny_engine::Object car = create_car_obj(all_crps[i].car, scene_name);
+
+            size_t obj_id = engine->addObject(car);
             index_to_obj_id[all_crps[i].index] = obj_id;
             
             if (all_crps[i].index == crp.index) {
