@@ -66,11 +66,11 @@ int main() {
     if (is_mp == 0) {
         tiny_engine::Object mustang;
         mustang.scene_name = "main";
-        mustang.gltf_model_path = "cars/mustang/mustang.gltf";
-        // mustang.gltf_model_path = "cars/ferrari_f40/ferrari_f40.gltf";
-        // mustang.albedo_path = "cars/ferrari_f40/ferrari_aslbedo.png";
-        // mustang.mr_path = "cars/ferrari_f40/ferrari_mr.png";
-        // mustang.normal_path = "cars/ferrari_f40/ferrari_nrm.png";
+        // mustang.gltf_model_path = "cars/mustang/mustang.gltf";
+        mustang.gltf_model_path = "cars/ferrari_f40/ferrari_f40.gltf";
+        mustang.albedo_path = "cars/ferrari_f40/ferrari_aslbedo.png";
+        mustang.mr_path = "cars/ferrari_f40/ferrari_mr.png";
+        mustang.normal_path = "cars/ferrari_f40/ferrari_nrm.png";
         mustang.pos = glm::translate(glm::mat4(1), glm::vec3(0.f));
 
         size_t mustang_id = engine.addObject(mustang);
@@ -153,7 +153,9 @@ int main() {
         
         if (is_mp)
             mp.update(glm::rotate(glm::translate(glm::rotate(glm::mat4(1.f), glm::radians(180.f), glm::vec3(1.0f, 0.0f, 0.0f)), car.m_pos), glm::radians(car.m_yaw), glm::vec3(0.f, 1.f, 0.f)));
-            
+        
+        engine.setDirLight("main", glm::vec3(2.0f, (sin(glfwGetTime()) + 1), 2.0f));
+        
         sound_engine.setRPM(car.RPM);
         engine.update();
         engine.drawScene("main");
