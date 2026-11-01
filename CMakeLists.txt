@@ -9,7 +9,7 @@ set(TINY_ENGINE_NO_EXAMPLES ON CACHE BOOL "")
 
 set(SHADER_DEFINES
     "USE_NORMAL_MAP"
-   #  "USE_MR_RED_AS_AO"
+    # "USE_MR_RED_AS_AO"
     "TONE_MAPPING"
     CACHE STRING "Shader defines passed to Tiny_engine glslc"
 )
@@ -18,7 +18,7 @@ FetchContent_Declare(
    Tiny_engine
    GIT_REPOSITORY https://github.com/zen4xx/tiny_engine.git
    GIT_TAG        master
-   )
+)
 
 FetchContent_MakeAvailable(Tiny_engine)
 
@@ -37,18 +37,34 @@ else()
    FetchContent_Declare(
       openal
       GIT_REPOSITORY https://github.com/kcat/openal-soft.git
-      master
-      GIT_SHALLOW TRUE
+      GIT_TAG        master
    )
 
-FetchContent_MakeAvailable(openal)
+   FetchContent_MakeAvailable(openal)
 endif()
-
-set(CMAKE_DIR "${tiny_engine_SOURCE_DIR}/tiny_engine_assets")
-set(TARGET_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
-file(COPY ${CMAKE_DIR} DESTINATION ${TARGET_DIR}) # for nessasery tiny_engine assets
 
 add_executable(half_fast_and_half_furious main.cpp Car.cpp)
 
-target_include_directories(half_fast_and_half_furious PRIVATE ${tiny_engine_SOURCE_DIR} ${OPENAL_INCLUDE_DIR})
-target_link_libraries(half_fast_and_half_furious PRIVATE Tiny_engine ${OPENAL_LIBRARY})
+target_include_directories(half_fast_and_half_furious PRIVATE 
+    ${tiny_engine_SOURCE_DIR} 
+    ${OPENAL_INCLUDE_DIR}
+)
+
+target_link_libraries(half_fast_and_half_furious PRIVATE 
+    Tiny_engine 
+    ${OPENAL_LIBRARY}
+)
+
+add_dependencies(half_fast_and_half_furious Tiny_engine)
+
+set(ENGINE_SHADER_DIR "${tiny_engine_SOURCE_DIR}/tiny_engine_assets/shaders")
+set(GAME_SHADER_DIR "${CMAKE_CURRENT_BINARY_DIR}/tiny_engine_assets/shaders")
+
+file(MAKE_DIRECTORY "${GAME_SHADER_DIR}")
+
+add_custom_command(TARGET half_fast_and_half_furious POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+            "${ENGINE_SHADER_DIR}"
+            "${GAME_SHADER_DIR}"
+    COMMENT "Copying compiled shaders from Tiny_engine to game build directory..."
+)

@@ -7,5 +7,6 @@ Makefile
 /build
 /_deps
 /.cache
+/tiny_engine_assets
 log
 compile_commands.json

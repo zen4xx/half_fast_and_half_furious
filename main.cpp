@@ -153,7 +153,7 @@ int main() {
         if (is_mp)
             mp.update(glm::rotate(glm::translate(glm::rotate(glm::mat4(1.f), glm::radians(180.f), glm::vec3(1.0f, 0.0f, 0.0f)), car.m_pos), glm::radians(car.m_yaw), glm::vec3(0.f, 1.f, 0.f)));
         
-        engine.setDirLight("main", glm::vec3(2.0f, (sin(glfwGetTime()) + 1), 2.0f));
+        engine.setDirLight("main", glm::vec3(2.0f, (sin(glfwGetTime()) + 1.5), 2.0f));
         
         sound_engine.setRPM(car.RPM);
         engine.update();
