@@ -57,14 +57,14 @@ target_link_libraries(half_fast_and_half_furious PRIVATE
 
 add_dependencies(half_fast_and_half_furious Tiny_engine)
 
-set(ENGINE_SHADER_DIR "${tiny_engine_SOURCE_DIR}/tiny_engine_assets/shaders")
-set(GAME_SHADER_DIR "${CMAKE_CURRENT_BINARY_DIR}/tiny_engine_assets/shaders")
+set(ENGINE_ASSETS_DIR "${tiny_engine_SOURCE_DIR}/tiny_engine_assets")
+set(GAME_ASSETS_DIR "${CMAKE_CURRENT_BINARY_DIR}/tiny_engine_assets")
 
-file(MAKE_DIRECTORY "${GAME_SHADER_DIR}")
+file(MAKE_DIRECTORY "${GAME_ASSETS_DIR}")
 
 add_custom_command(TARGET half_fast_and_half_furious POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
-            "${ENGINE_SHADER_DIR}"
-            "${GAME_SHADER_DIR}"
+            "${ENGINE_ASSETS_DIR}"
+            "${GAME_ASSETS_DIR}"
     COMMENT "Copying compiled shaders from Tiny_engine to game build directory..."
 )
