@@ -81,7 +81,7 @@ void Car::update(double dt) {
 
         m_pos += m_front * float(this->speed * dt);
 
-        m_engine->moveObject(m_scene_name, m_obj_id, glm::rotate(glm::translate(m_original_rotation, m_pos), glm::radians(m_yaw), glm::vec3(0.f, 1.f, 0.f)));
+        m_engine->moveObject(m_scene_id, m_obj_id, glm::rotate(glm::translate(m_original_rotation, m_pos), glm::radians(m_yaw), glm::vec3(0.f, 1.f, 0.f)));
     }
 }
 

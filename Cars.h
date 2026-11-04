@@ -3,30 +3,30 @@
 #include "renderer/renderer.h"
 #include <string>
 
-inline tiny_engine::Object create_mustang_obj(std::string scene_name)
+inline tiny_engine::Object create_mustang_obj(size_t scene_id)
 {
     tiny_engine::Object mustang;
     mustang.gltf_model_path = "cars/mustang/mustang.gltf";
-    mustang.scene_name = scene_name;
+    mustang.scene_id = scene_id;
     mustang.pos = glm::mat4(1);
 
     return mustang;
 }
 
-inline tiny_engine::Object create_ferrari_f40_obj(std::string scene_name)
+inline tiny_engine::Object create_ferrari_f40_obj(size_t scene_id)
 {
     tiny_engine::Object ferrari;
     ferrari.gltf_model_path = "cars/ferrari_f40/ferrari_f40.gltf";
     ferrari.albedo_path = "cars/ferrari_f40/ferrari_albedo.png";
     ferrari.mr_path = "cars/ferrari_f40/ferrari_mr.png";
     ferrari.normal_path = "cars/ferrari_f40/ferrari_nrm.png";
-    ferrari.scene_name = scene_name;
+    ferrari.scene_id = scene_id;
     ferrari.pos = glm::mat4(1);
 
     return ferrari;
 }
 
-inline tiny_engine::Object create_diablo_obj(std::string scene_name)
+inline tiny_engine::Object create_diablo_obj(size_t scene_id)
 {
     tiny_engine::Object diablo;
     diablo.gltf_model_path = "cars/lamborgambr_diablo/lambrgambr_diablo.gltf";
@@ -34,11 +34,11 @@ inline tiny_engine::Object create_diablo_obj(std::string scene_name)
     diablo.normal_path = "cars/lamborgambr_diablo/diablo_nrm.png";
     diablo.mr_path = "cars/lamborgambr_diablo/diablo_mr.png";
     diablo.pos = glm::mat4(1);
-    diablo.scene_name = scene_name;
+    diablo.scene_id = scene_id;
     return diablo;
 }
 
-inline tiny_engine::Object create_porsche_911_obj(std::string scene_name)
+inline tiny_engine::Object create_porsche_911_obj(size_t scene_id)
 {
     tiny_engine::Object porsche;
     porsche.gltf_model_path = "cars/porsche_911/porsche.gltf";
@@ -46,11 +46,11 @@ inline tiny_engine::Object create_porsche_911_obj(std::string scene_name)
     porsche.normal_path = "cars/porsche_911/porsche_nrm.png";
     porsche.mr_path = "cars/porsche_911/porsche_mr.png";
     porsche.pos = glm::mat4(1);
-    porsche.scene_name = scene_name;
+    porsche.scene_id = scene_id;
     return porsche;
 }
 
-inline tiny_engine::Object create_supra_obj(std::string scene_name)
+inline tiny_engine::Object create_supra_obj(size_t scene_id)
 {
     tiny_engine::Object supra;
     supra.gltf_model_path = "cars/supra/supra.gltf";
@@ -58,11 +58,11 @@ inline tiny_engine::Object create_supra_obj(std::string scene_name)
     supra.normal_path = "cars/supra/supra_nrm.png";
     supra.mr_path = "cars/supra/supra_mr.png";
     supra.pos = glm::mat4(1);
-    supra.scene_name = scene_name;
+    supra.scene_id = scene_id;
     return supra;
 }
 
-inline tiny_engine::Object create_car_obj(int car_index, std::string scene_name)
+inline tiny_engine::Object create_car_obj(int car_index, size_t scene_id)
 {
     tiny_engine::Object car;
 
@@ -70,32 +70,32 @@ inline tiny_engine::Object create_car_obj(int car_index, std::string scene_name)
     {
         case(0):
         {
-            car = create_mustang_obj(scene_name);
+            car = create_mustang_obj(scene_id);
             break;
         }
         case(1):
         {
-            car = create_ferrari_f40_obj(scene_name);
+            car = create_ferrari_f40_obj(scene_id);
             break;
         }
         case(2):
         {
-            car = create_diablo_obj(scene_name);
+            car = create_diablo_obj(scene_id);
             break;
         }
         case(3):
         {
-            car = create_porsche_911_obj(scene_name);
+            car = create_porsche_911_obj(scene_id);
             break;
         }
         case(4):
         {
-            car = create_supra_obj(scene_name);
+            car = create_supra_obj(scene_id);
             break;
         }
         default:
         {
-            car = create_mustang_obj(scene_name);
+            car = create_mustang_obj(scene_id);
             break;
         }
     }

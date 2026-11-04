@@ -39,15 +39,15 @@ int main() {
     if (glfwRawMouseMotionSupported())
         glfwSetInputMode(engine.getWindow(), GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
 
-    engine.createScene("main");
-    engine.setDirLight("main", glm::vec3(2.0f, 0.5f, 2.0f));
-    engine.setDirLightColor("main", glm::vec3(1.8f, 1.69f, 1.46f));    
-    engine.setAmbient("main", glm::vec3(0.12f, 0.14f, 0.18f));
-    engine.setDrawDistance("main", 100.f);
-    engine.setView("main", camera.GetViewMatrix());
+    size_t main = engine.createScene();
+    engine.setDirLight(main, glm::vec3(2.0f, 0.5f, 2.0f));
+    engine.setDirLightColor(main, glm::vec3(1.8f, 1.69f, 1.46f));    
+    engine.setAmbient(main, glm::vec3(0.12f, 0.14f, 0.18f));
+    engine.setDrawDistance(main, 100.f);
+    engine.setView(main, camera.GetViewMatrix());
 
     tiny_engine::Object plane;
-    plane.scene_name = "main";
+    plane.scene_id = main;
     plane.albedo_path = "plane/TwoSidedPlane_BaseColor.png";
     plane.mr_path = "plane/TwoSidedPlane_MetallicRoughness.png";
     plane.normal_path = "plane/TwoSidedPlane_Normal.png";
@@ -70,10 +70,10 @@ int main() {
     set_car(car_index, car);
 
     if (is_mp == 0) {
-        tiny_engine::Object car_obj = create_car_obj(car_index, "main");
+        tiny_engine::Object car_obj = create_car_obj(car_index, main);
         std::cout << car_obj.albedo_path << std::endl;
         size_t mustang_id = engine.addObject(car_obj);
-        car.set("main", mustang_id, &engine, glm::vec3(0.0f, 1.0f, 0.0f), glm::rotate(glm::mat4(1.f), glm::radians(180.f), glm::vec3(1.0f, 0.0f, 0.0f)));
+        car.set(main, mustang_id, &engine, glm::vec3(0.0f, 1.0f, 0.0f), glm::rotate(glm::mat4(1.f), glm::radians(180.f), glm::vec3(1.0f, 0.0f, 0.0f)));
     }
     else {
         std::string ip, name;
@@ -85,13 +85,13 @@ int main() {
         std::cout << "enter the gamemode (0 is without any gamemodes, 1 is catch the helmet): ";
         std::cin >> gamemode;
         
-        mp.set_player(name.c_str(), car_index, ip, &engine, "main", char(gamemode));
+        mp.set_player(name.c_str(), car_index, ip, &engine, main, char(gamemode));
     
         std::cout << "write something to start\n";
         std::cin >> ip;
         mp.start();
         
-        car.set("main", mp.get_local_player_obj_id(), &engine, glm::vec3(0.0f, 1.0f, 0.0f), glm::rotate(glm::mat4(1.f), glm::radians(180.f), glm::vec3(1.0f, 0.0f, 0.0f)));
+        car.set(main, mp.get_local_player_obj_id(), &engine, glm::vec3(0.0f, 1.0f, 0.0f), glm::rotate(glm::mat4(1.f), glm::radians(180.f), glm::vec3(1.0f, 0.0f, 0.0f)));
     }
 
     bool key_1 = 0, key_2 = 0, free_cam = 0, third_person_cam = 0;
@@ -140,24 +140,24 @@ int main() {
         car.update(engine.getDeltaTime());
 
         if (is_free_cam)
-            engine.setView("main", camera.GetViewMatrix());
+            engine.setView(main, camera.GetViewMatrix());
         else {
             if (car.gear != 0)
                 car_tail_pos = car.m_pos - (car.m_front * 3.f * ((car.speed/50)+1.f));
             else 
                 car_tail_pos = car.m_pos - (car.m_front * -5.f * ((-car.speed/50)+1.f)); // reverse
 
-            engine.setView("main", glm::lookAt(glm::vec3(car_tail_pos.x, car_tail_pos.y - 1.5f, -car_tail_pos.z), glm::vec3(car.m_pos.x, car.m_pos.y - 1.f, -car.m_pos.z), camera.WorldUp));
+            engine.setView(main, glm::lookAt(glm::vec3(car_tail_pos.x, car_tail_pos.y - 1.5f, -car_tail_pos.z), glm::vec3(car.m_pos.x, car.m_pos.y - 1.f, -car.m_pos.z), camera.WorldUp));
         }
         
         if (is_mp)
             mp.update(glm::rotate(glm::translate(glm::rotate(glm::mat4(1.f), glm::radians(180.f), glm::vec3(1.0f, 0.0f, 0.0f)), car.m_pos), glm::radians(car.m_yaw), glm::vec3(0.f, 1.f, 0.f)));
         
-        engine.setDirLight("main", glm::vec3(2.0f, (sin(glfwGetTime()) + 1.5), 2.0f));
+        engine.setDirLight(main, glm::vec3(2.0f, (sin(glfwGetTime()) + 1.5), 2.0f));
         
         sound_engine.setRPM(car.RPM);
         engine.update();
-        engine.drawScene("main");
+        engine.drawScene(main);
     }
     return 0;
 }

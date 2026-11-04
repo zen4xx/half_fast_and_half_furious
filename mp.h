@@ -69,7 +69,7 @@ public:
         players = nullptr;
     }
 
-    void set_player(const char name[NAME_LEN], char car, std::string server_ip, Tiny_engine *engine, std::string scene_name, char game_mode) {
+    void set_player(const char name[NAME_LEN], char car, std::string server_ip, Tiny_engine *engine, size_t scene_id, char game_mode) {
         strcpy(crp.name, name);
         crp.car = car;
         crp.game_mode = game_mode;
@@ -104,7 +104,7 @@ public:
 
         crp.index = *(int*)buffer;
         this->engine = engine;
-        this->scene_name = scene_name;
+        this->scene_id = scene_id;
     }
 
     void start() {
@@ -122,7 +122,7 @@ public:
         int num_players = n / (int)sizeof(creation_payload);
         for (int i = 0; i < num_players; ++i) {
 
-            tiny_engine::Object car = create_car_obj(all_crps[i].car, scene_name);
+            tiny_engine::Object car = create_car_obj(all_crps[i].car, scene_id);
 
             size_t obj_id = engine->addObject(car);
             index_to_obj_id[all_crps[i].index] = obj_id;
@@ -134,7 +134,7 @@ public:
 
         if (crp.game_mode == 1) { // catch the helmet
             helmet_obj_id = engine->addObject(
-                this->scene_name, 
+                this->scene_id, 
                 "damaged_helmet/DamagedHelmet.gltf", 
                 glm::rotate(glm::mat4(1), glm::radians(-90.f), glm::vec3(1, 0, 0)), 
                 "damaged_helmet/Default_albedo.jpg", 
@@ -164,7 +164,7 @@ public:
         for (int i = 0; i < num_players; ++i) {
             auto it = index_to_obj_id.find(players[i].index);
             if (it != index_to_obj_id.end()) {
-                engine->moveObject(scene_name, it->second, players[i].mat);
+                engine->moveObject(scene_id, it->second, players[i].mat);
             }
         }    
 
@@ -173,7 +173,7 @@ public:
             hmodel = glm::translate(hmodel, players[0].hpos);
             hmodel = glm::rotate(hmodel, glm::radians(180.f), glm::vec3(0, 0, 1));
             hmodel = glm::rotate(hmodel, glm::radians((float)glfwGetTime() * 50.f), glm::vec3(0, 1, 0));
-            engine->moveObject(scene_name, helmet_obj_id, hmodel);
+            engine->moveObject(scene_id, helmet_obj_id, hmodel);
         }
     }
 
@@ -196,5 +196,5 @@ private:
     size_t local_player_obj_id = 0;
     size_t helmet_obj_id = 0;
     Tiny_engine *engine;
-    std::string scene_name;
+    size_t scene_id;
 };

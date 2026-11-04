@@ -1,6 +1,7 @@
 #pragma once
 
 #include "tiny_engine.h"
+#include <cstddef>
 #include <vector>
 #include <string>
 
@@ -12,9 +13,9 @@ enum dir {
 class Car 
 {
 public:
-    inline void set(const std::string &scene_name, size_t obj_id, Tiny_engine *engine, glm::vec3 world_up, glm::mat4 rotation, glm::vec3 pos = glm::vec3(0)) 
+    inline void set(size_t scene_id, size_t obj_id, Tiny_engine *engine, glm::vec3 world_up, glm::mat4 rotation, glm::vec3 pos = glm::vec3(0)) 
     {
-        m_scene_name = scene_name;
+        m_scene_id = scene_id;
         m_obj_id = obj_id;
         m_engine = engine; 
         m_pos = pos;
@@ -71,7 +72,7 @@ public:
     
 public:
     Tiny_engine *m_engine = nullptr;
-    std::string m_scene_name = "";
+    size_t m_scene_id = 0;
     size_t m_obj_id = 0;
     
     glm::vec3 m_pos = glm::vec3(0);
